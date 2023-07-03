@@ -5,8 +5,8 @@
 using namespace std;
 
 // function to evaluate the circuit
-bool evaluateCircuit(const vector<pair<string, string>>& circuit, const vector<int>& inputVector) {
-    vector<int> values(circuit.size());  // ftore the values of each net in the circuit
+bool evaluate_circuit(const vector<pair<string, string>>& circuit, const vector<int>& input_vector) {
+    vector<int> values(circuit.size());  // store the values of each net in the circuit
 
     for (int i = 0; i < circuit.size(); i++) {
         string expression = circuit[i].second;
@@ -14,53 +14,52 @@ bool evaluateCircuit(const vector<pair<string, string>>& circuit, const vector<i
 
         if (expression[0] == '~') {
             // NOT gate operation
-            int inputIndex = -1;
+            int input_index = -1;
             for (int j = 0; j < circuit.size(); j++) {
                 if (circuit[j].first == expression.substr(1)) {
-                    inputIndex = j;
+                    input_index = j;
                     break;
                 }
             }
-            values[i] = 1 - values[inputIndex];
+            values[i] = 1 - values[input_index];
         }
         else {
             // gate operations (AND, OR, XOR)
-            size_t opPos = string::npos;
+            size_t op_pos = string::npos;
             for (int j = 0; j < expression.size(); j++) {
                 if (expression[j] == '&' || expression[j] == '|' || expression[j] == '^') {
-                    opPos = j;
+                    op_pos = j;
                     break;
                 }
             }
-            string leftNet = expression.substr(0, opPos);
-            string rightNet = expression.substr(opPos + 1);
+            string left_net = expression.substr(0, op_pos);
+            string right_net = expression.substr(op_pos + 1);
 
-            int leftIndex = -1;
-            int rightIndex = -1;
+            int left_index = -1;
+            int right_index = -1;
             for (int j = 0; j < circuit.size(); j++) {
-                if (circuit[j].first == leftNet) {
-                    leftIndex = j;
+                if (circuit[j].first == left_net) {
+                    left_index = j;
                 }
-                if (circuit[j].first == rightNet) {
-                    rightIndex = j;
+                if (circuit[j].first == right_net) {
+                    right_index = j;
                 }
             }
 
-            if (expression[opPos] == '&') {
+            if (expression[op_pos] == '&') {
                 // AND gate operation
-                values[i] = values[leftIndex] & values[rightIndex];
+                values[i] = values[left_index] & values[right_index];
             }
-            else if (expression[opPos] == '|') {
+            else if (expression[op_pos] == '|') {
                 // OR gate operation
-                values[i] = values[leftIndex] | values[rightIndex];
+                values[i] = values[left_index] | values[right_index];
             }
-            else if (expression[opPos] == '^') {
+            else if (expression[op_pos] == '^') {
                 // XOR gate operation
-                values[i] = values[leftIndex] ^ values[rightIndex];
+                values[i] = values[left_index] ^ values[right_index];
             }
         }
     }
-
     return values.back();  // return the value of the output(Z)
 }
 
@@ -73,27 +72,27 @@ int main() {
         { "Z", "net_g ^ net_e"}
     };
 
-    string faultNode = "net_f";  // fault node location
-    string faultType = "SA0";    // fault type
+    string fault_node = "net_f";  // fault node location
+    string fault_type = "SA0";    // fault type
 
-    vector<int> inputVector(4, 0);  // initialize the input vector with zeros
+    vector<int> input_vector(4, 0);  // initialize the input vector with zeros
 
-    for (int i = 0; i < inputVector.size(); i++) {
-        inputVector[i] = 1;  // set the i-th input to 1
+    for (int i = 0; i < input_vector.size(); i++) {
+        input_vector[i] = 1;  // set the i-th input to 1
 
-        bool originalOutput = evaluateCircuit(circuit, inputVector);
+        bool original_output = evaluate_circuit(circuit, input_vector);
 
-        inputVector[i] = 0;  // set the i-th input to 0
+        input_vector[i] = 0;  // set the i-th input to 0
 
-        bool modifiedOutput = evaluateCircuit(circuit, inputVector);
+        bool modified_output = evaluate_circuit(circuit, input_vector);
 
-        if ((faultType == "SA0" && modifiedOutput != originalOutput) ||
-            (faultType == "SA1" && modifiedOutput == originalOutput)) {
+        if ((fault_type == "SA0" && modified_output != original_output) ||
+            (fault_type == "SA1" && modified_output == original_output)) {
             // print the input test vector and expected output
-            cout << "[" << inputVector[0] << ", " << inputVector[1] << ", " << inputVector[2] << ", " << inputVector[3] << "], Z = " << originalOutput << endl;
+            cout << "[" << input_vector[0] << ", " << input_vector[1] << ", " << input_vector[2] << ", " << input_vector[3] << "], Z = " << original_output << endl;
         }
 
-        inputVector[i] = 1;  // reset the i-th input back to 1
+        input_vector[i] = 1;  // reset the i-th input back to 1
     }
 
     return 0;
