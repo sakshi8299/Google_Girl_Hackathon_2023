@@ -2,4 +2,4 @@
 
 Code is written in C++ Language.
 Can use any C++ Compiler to run the code.
-Code is written for the example given in the document.
+Code is written for the logic structure given in the document only.
